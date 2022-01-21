@@ -1,0 +1,89 @@
+
+
+name: CI-CD
+# Controla quando será executado o workflow
+on:
+
+  # Definimos o que vai disparar o workflow 
+  push:
+    branches: [ main ]
+
+  # Permite executar o workflow manualmente
+  workflow_dispatch:
+
+# Definimos os jobs que serão executados
+jobs:
+  # TJob de Build
+  CI:
+    # Onde sera rodado o Job
+    runs-on: ubuntu-latest
+
+    # Tasks do job
+    steps:
+      # EXEMPLO DE ACTION
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      # EXEMPLO DE COMANDO
+      # Runs a set of commands using the runners shell
+      # - name: Run a multi-line script
+      #  run: |
+      #    echo Add other actions to build,
+      #    echo test, and deploy your project.
+      
+      # Logando no Docker
+      - name: Docker Login
+        
+        uses: docker/login-action@v1.12.0
+        with:
+          # Usando secrets do github
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      # Usando o Docker build e push
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          # Contexto para o comando docker build (Diretorio)
+          context: ./src
+          # Arquivo de build
+          file: ./src/Dockerfile
+          # Para executar o push no DockerHub           
+          push: true
+          # Definindo as tags
+          # O Versionamento da imagem é de acordo com a quantidade de execucoes da pipeline
+          # atraves de github.run_number
+          tags: | 
+            ricardovessaro/rotten-potatoes:latest  
+            ricardovessaro/rotten-potatoes:${{ github.run_number }} 
+            
+  CD:
+    # So executa depois que executar o CI
+    needs: [CI]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      # Conectando ao cluster kubernetes
+      # O Kubernetes Set Context funciona com qualquer cluster Kubernetes
+      - name: Kubernetes Set Context
+        uses: Azure/k8s-set-context@v2
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+          
+      - name: Deploy to Kubernetes cluster
+        uses: Azure/k8s-deploy@v1.5
+        with: 
+          # Imagem
+          images: ricardovessaro/rotten-potatoes:${{ github.run_number }}
+          # Arquivo de manifesto que sera aplicado
+          manifests: |
+             k8s/deployment.yaml
+              
+          
+      
+
+
+
