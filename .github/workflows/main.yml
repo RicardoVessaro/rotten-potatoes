@@ -66,11 +66,22 @@ jobs:
       - uses: actions/checkout@v2
       
       # Conectando ao cluster kubernetes
+      # O Kubernetes Set Context funciona com qualquer cluster Kubernetes
       - name: Kubernetes Set Context
         uses: Azure/k8s-set-context@v2
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+          
+      - name: Deploy to Kubernetes cluster
+        uses: Azure/k8s-deploy@v1.5
+        with: 
+          # Imagem
+          images: ricardovessaro/rotten-potatoes:${{ github.run_number }}
+          # Arquivo de manifesto que sera aplicado
+          manifests: |
+             k8s/deployment.yaml
+              
           
       
 
