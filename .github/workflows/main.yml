@@ -58,6 +58,8 @@ jobs:
             ricardovessaro/rotten-potatoes:${{ github.run_number }} 
             
   CD:
+    # So executa depois que executar o CI
+    needs: [CI]
     runs-on: ubuntu-latest
     
     steps:
