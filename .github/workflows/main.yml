@@ -14,7 +14,7 @@ on:
 # Definimos os jobs que serão executados
 jobs:
   # TJob de Build
-  build:
+  CI:
     # Onde sera rodado o Job
     runs-on: ubuntu-latest
 
@@ -56,6 +56,21 @@ jobs:
           tags: | 
             ricardovessaro/rotten-potatoes:latest  
             ricardovessaro/rotten-potatoes:${{ github.run_number }} 
+            
+  CD:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      # Conectando ao cluster kubernetes
+      - name: Kubernetes Set Context
+        uses: Azure/k8s-set-context@v2
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_KUBECONFIG }}
+          
+      
 
 
 
