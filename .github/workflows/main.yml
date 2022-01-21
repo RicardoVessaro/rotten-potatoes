@@ -51,11 +51,10 @@ jobs:
           # Para executar o push no DockerHub           
           push: true
           # Definindo as tags
+          # O Versionamento da imagem é de acordo com a quantidade de execucoes da pipeline
+          # atraves de github.run_number
           tags: | 
-            ricardovessaro/rotten-potatoes:latest
-            
-            # O Versionamento da imagem é de acordo com a quantidade de execucoes da pipeline
-            # atraves de github.run_number
+            ricardovessaro/rotten-potatoes:latest  
             ricardovessaro/rotten-potatoes:{{ github.run_number }} 
 
 
