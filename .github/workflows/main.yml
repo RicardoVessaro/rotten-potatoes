@@ -1,35 +1,42 @@
-# This is a basic workflow to help you get started with Actions
+
 
 name: CI-CD
-
-# Controls when the workflow will run
+# Controla quando será executado o workflow
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+
   # Definimos o que vai disparar o workflow 
   push:
     branches: [ main ]
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Permite executar o workflow manualmente
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# Definimos os jobs que serão executados
 jobs:
-  # This workflow contains a single job called "build"
+  # TJob de Build
   build:
-    # The type of runner that the job will run on
+    # Onde sera rodado o Job
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    # Tasks do job
     steps:
+      # EXEMPLO DE ACTION
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
+      
+      # EXEMPLO DE COMANDO
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+      # - name: Run a multi-line script
+      #  run: |
+      #    echo Add other actions to build,
+      #    echo test, and deploy your project.
+      
+      - name: Docker Login
+
+        uses: docker/login-action@v1.12.0
+        with:
+          # Usando secrets do github
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+
