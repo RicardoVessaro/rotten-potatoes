@@ -31,12 +31,32 @@ jobs:
       #    echo Add other actions to build,
       #    echo test, and deploy your project.
       
+      # Logando no Docker
       - name: Docker Login
-
+        
         uses: docker/login-action@v1.12.0
         with:
           # Usando secrets do github
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      # Usando o Docker build e push
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v2.7.0
+        with:
+          # Contexto para o comando docker build (Diretorio)
+          context: ./src
+          # Arquivo de build
+          file: ./src/Dockerfile
+          # Para executar o push no DockerHub           
+          push: true
+          # Definindo as tags
+          tags: | 
+            ricardovessaro/rotten-potatoes:latest
+            
+            # O Versionamento da imagem é de acordo com a quantidade de execucoes da pipeline
+            # atraves de github.run_number
+            ricardovessaro/rotten-potatoes:{{ github.run_number }} 
+
 
 
